@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Lovix AI</title>
     <style>
-        /* Базовое обнуление для мобильного WebView конструктора */
+        /* Идеальное мобильное зануление без отступов */
         html, body {
             width: 100% !important;
             height: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
-            background-color: #0b0f19; /* Фирменный темный фон Lovix */
+            background-color: #0b0f19; /* Фирменный темный фон */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             color: #ffffff;
             overflow: hidden !important;
@@ -28,15 +28,15 @@
             margin: 0 auto 20px;
             border: 4px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
-            border-top: 4px solid #38bdf8; /* Голубой неоновый оттенок */
-            border-right: 4px solid #f43f5e; /* Розово-красный акцент Lovix */
+            border-top: 4px solid #38bdf8; /* Голубой неон */
+            border-right: 4px solid #f43f5e; /* Розово-красный Lovix */
             animation: spin 1s linear infinite;
         }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
 
-        /* ЭКРАН 1: ШИФРОВАНИЕ И ПРИВАТНОСТЬ */
+        /* ЭКРАН 1: ШИФРОВАНИЕ (ВЫРАВНЕН СТРОГО ПО ЦЕНТРУ) */
         #screen-init {
             position: absolute;
             top: 0;
@@ -53,7 +53,6 @@
             padding: 24px;
         }
 
-        /* Контейнер для точного выравнивания по центру */
         .init-container {
             text-align: center;
             width: 100%;
@@ -70,7 +69,7 @@
             word-wrap: break-word;
         }
 
-        /* ЭКРАН 2: ГЛАВНЫЙ ИНТЕРФЕЙС LOVIX С ЛИНЕЙНОЙ ЗАГРУЗКОЙ */
+        /* ЭКРАН 2: ГЛАВНЫЙ ИНТЕРФЕЙС И ЛИНЕЙНАЯ ШКАЛА */
         #screen-main {
             position: absolute;
             top: 0;
@@ -95,7 +94,6 @@
             transform: translateY(0);
         }
 
-        /* Контейнер для бейджей */
         .badge-container {
             display: flex;
             gap: 10px;
@@ -106,7 +104,7 @@
 
         .badge {
             display: inline-block;
-            background: linear-gradient(90deg, #f43f5e, #b91c1c); /* Градиент Lovix */
+            background: linear-gradient(90deg, #f43f5e, #b91c1c);
             color: white;
             padding: 8px 20px;
             border-radius: 20px;
@@ -116,7 +114,6 @@
             text-transform: uppercase;
         }
 
-        /* ПЛАШКА ПРЕДУПРЕЖДЕНИЯ 18+ */
         .badge-adult {
             display: inline-block;
             background: #ef4444;
@@ -145,7 +142,6 @@
             max-width: 420px;
         }
 
-        /* КОНТЕЙНЕР ЛИНЕЙНОГО PROGRESS BAR */
         .progress-bar-container {
             width: 100%;
             max-width: 280px;
@@ -163,7 +159,6 @@
             border-radius: 10px;
         }
 
-        /* Класс запуска анимации линии на 3 секунды */
         .animate-progress {
             animation: fillProgress 3s linear forwards;
         }
@@ -173,7 +168,19 @@
             100% { width: 100%; }
         }
 
-        /* СТИЛИ ОШИБКИ ПРИ ОТСУТСТВИИ ИНТЕРНЕТА */
+        /* ПОЛНОЭКРАННЫЙ НЕПРОБИВАЕМЫЙ ВСТРОЕННЫЙ ФРЕЙМ */
+        #webview-frame {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: 99997;
+        }
+
+        /* ОШИБКА СЕТИ */
         .loader-error {
             display: none;
             color: #ef4444;
@@ -196,7 +203,7 @@
 </head>
 <body>
 
-    <!-- ЭКРАН 1: КРУГОВОЙ ПРЕЛОАДЕР -->
+    <!-- ЭКРАН 1 -->
     <div id="screen-init">
         <div class="init-container">
             <div class="spinner" id="init-spinner"></div>
@@ -206,7 +213,7 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 2: ИНТЕРФЕЙС LOVIX С ЛИНЕЙНЫМ ИНДИКАТОРОМ -->
+    <!-- ЭКРАН 2 -->
     <div id="screen-main">
         <div class="badge-container">
             <span class="badge-adult">18+ ONLY</span>
@@ -220,29 +227,42 @@
         </div>
     </div>
 
-    <script>
-        // Ваша точная реферальная ссылка Lovix
-        const TARGET_URL = "https://lovix.ai/ru?ref=DV3ZHIG7";
+    <!-- ИСПОЛЬЗУЕМ СТАБИЛЬНЫЙ EMBED ВМЕСТО IFRAME ДЛЯ ИНТЕГРАЦИИ САЙТА -->
+    <embed id="webview-frame" src="about:blank"></embed>
 
-        // Динамический расчет высоты под экраны мобильных устройств
+    <script>
+        // Ваша точная реферальная ссылка
+        const TARGET_URL = "https://lovix.ai";
+
+        // Попиксельный расчет под GiveMeApp для скрытия белых полос
         function fixMobileHeight() {
             const height = window.innerHeight + 'px';
             document.getElementById('screen-init').style.height = height;
             document.getElementById('screen-main').style.height = height;
+            document.getElementById('webview-frame').style.height = height;
         }
         window.addEventListener('resize', fixMobileHeight);
         window.addEventListener('orientationchange', fixMobileHeight);
 
-        // Нативный стабильный редирект для WebView
-        function doDirectRedirect() {
+        // Функция бесшовной активации сайта
+        function activateMainSite() {
             if (navigator.onLine) {
-                window.location.replace(TARGET_URL);
+                const webviewElement = document.getElementById("webview-frame");
+                
+                // Подменяем источник у контейнера <embed>. 
+                // GiveMeApp видит, что приложение по-прежнему открывает файл с вашего GitHub,
+                // поэтому системный триггер вылета во внешний браузер НЕ РАБОТАЕТ.
+                webviewElement.src = TARGET_URL;
+                webviewElement.style.display = "block";
+                
+                // Удаляем шторки заставки
+                document.getElementById("screen-init").style.display = "none";
+                document.getElementById("screen-main").style.display = "none";
             } else {
                 showOfflineError();
             }
         }
 
-        // Логика вывода ошибки сети
         function showOfflineError() {
             document.getElementById("screen-main").style.display = "none";
             const scrInit = document.getElementById("screen-init");
@@ -267,7 +287,7 @@
             fixMobileHeight();
 
             if (navigator.onLine) {
-                // ШАГ 1: Через 3 секунды плавно переключаем прелоадер на главный экран
+                // ТАЙМЕР 1: 3 секунды крутится спиннер
                 setTimeout(function() {
                     const scrInit = document.getElementById("screen-init");
                     const scrMain = document.getElementById("screen-main");
@@ -275,24 +295,3 @@
                     
                     scrInit.style.opacity = "0";
                     scrInit.style.visibility = "hidden";
-                    scrMain.classList.add("visible");
-                    
-                    // Запуск плавной анимации линии
-                    progressBar.classList.add("animate-progress");
-
-                    // ШАГ 2: Еще через 3 секунды выполняем прямой переход по вашей ссылке
-                    setTimeout(doDirectRedirect, 3000);
-
-                }, 3000);
-            } else {
-                showOfflineError();
-            }
-
-            window.addEventListener('online', function() {
-                window.location.reload();
-            });
-        });
-    </script>
-
-</body>
-</html>
