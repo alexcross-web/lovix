@@ -70,7 +70,7 @@
             word-wrap: break-word;
         }
 
-        /* ЭКРАН 2: ГЛАВНЫЙ ИНТЕРФЕЙС LOVIX С ЛИНЕЙНОЙ ЗАГРУЗКОЙ */
+        /* ЭКРАН 2: ГЛАВНЫЙ ИНТЕРФЕЙС LOVIX */
         #screen-main {
             position: absolute;
             top: 0;
@@ -145,32 +145,26 @@
             max-width: 420px;
         }
 
-        /* КОНТЕЙНЕР ЛИНЕЙНОГО PROGRESS BAR */
-        .progress-bar-container {
+        /* ГЛАВНАЯ КНОПКА ДЛЯ ВХОДА В ЧАТ */
+        .action-button {
+            display: inline-block;
             width: 100%;
             max-width: 280px;
-            height: 6px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 0 auto;
-        }
-
-        .progress-bar-fill {
-            width: 0%;
-            height: 100%;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-decoration: none;
             background: linear-gradient(90deg, #38bdf8, #f43f5e);
-            border-radius: 10px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Класс запуска анимации линии на 3 секунды */
-        .animate-progress {
-            animation: fillProgress 3s linear forwards;
-        }
-
-        @keyframes fillProgress {
-            0% { width: 0%; }
-            100% { width: 100%; }
+        .action-button:active {
+            transform: scale(0.97);
+            opacity: 0.9;
         }
 
         /* СТИЛИ ОШИБКИ ПРИ ОТСУТСТВИИ ИНТЕРНЕТА */
@@ -206,7 +200,7 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 2: ИНТЕРФЕЙС LOVIX С ЛИНЕЙНЫМ ИНДИКАТОРОМ -->
+    <!-- ЭКРАН 2: ИНТЕРФЕЙС LOVIX С КНОПКОЙ ОТКРЫТИЯ -->
     <div id="screen-main">
         <div class="badge-container">
             <span class="badge-adult">18+ ONLY</span>
@@ -215,15 +209,11 @@
         <h1>ИИ девушка:<br>онлайн-чат</h1>
         <p class="subtitle">Запустите ваш первый AI чат бесплатно и ощутите искренние, неподдельные эмоции. По ходу общения ваша ИИ девушка будет запоминать контекст диалогов.</p>
         
-        <div class="progress-bar-container">
-            <div id="main-progress-bar" class="progress-bar-fill"></div>
-        </div>
+        <!-- Кнопка перехода во встроенный браузер -->
+        <a href="https://lovix.ai" target="_self" class="action-button" id="start-chat-btn">Открыть чат</a>
     </div>
 
     <script>
-        // Ваша точная реферальная ссылка Lovix
-        const TARGET_URL = "https://lovix.ai/ru?ref=DV3ZHIG7";
-
         // Динамический расчет высоты под экраны мобильных устройств
         function fixMobileHeight() {
             const height = window.innerHeight + 'px';
@@ -233,15 +223,6 @@
         window.addEventListener('resize', fixMobileHeight);
         window.addEventListener('orientationchange', fixMobileHeight);
 
-        // Нативный стабильный редирект для WebView
-        function doDirectRedirect() {
-            if (navigator.onLine) {
-                window.location.replace(TARGET_URL);
-            } else {
-                showOfflineError();
-            }
-        }
-
         // Логика вывода ошибки сети
         function showOfflineError() {
             document.getElementById("screen-main").style.display = "none";
@@ -250,49 +231,43 @@
             scrInit.style.opacity = "1";
             scrInit.style.visibility = "visible";
 
-            const spinner = document.getElementById("init-spinner");
-            const statusText = document.getElementById("init-text");
-            
-            spinner.style.borderTopColor = "#ef4444";
-            spinner.style.borderRightColor = "#ef4444";
-            spinner.style.animation = "none"; 
-            statusText.textContent = "Не удалось подключиться к сети";
-            statusText.style.animation = "none";
-
+            document.getElementById("init-spinner").style.display = "none";
+            document.getElementById("init-text").style.display = "none";
             document.getElementById("error-msg").style.display = "block";
             document.getElementById("retry-button").style.display = "block";
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
+        // Жизненный цикл экранов
+        window.addEventListener('DOMContentLoaded', () => {
             fixMobileHeight();
-
-            if (navigator.onLine) {
-                // ШАГ 1: Через 3 секунды плавно переключаем прелоадер на главный экран
-                setTimeout(function() {
-                    const scrInit = document.getElementById("screen-init");
-                    const scrMain = document.getElementById("screen-main");
-                    const progressBar = document.getElementById("main-progress-bar");
-                    
-                    scrInit.style.opacity = "0";
-                    scrInit.style.visibility = "hidden";
-                    scrMain.classList.add("visible");
-                    
-                    // Запуск плавной анимации линии
-                    progressBar.classList.add("animate-progress");
-
-                    // ШАГ 2: Еще через 3 секунды выполняем прямой переход по вашей ссылке
-                    setTimeout(doDirectRedirect, 3000);
-
-                }, 3000);
-            } else {
+            
+            // Если устройство сразу офлайн — показываем ошибку
+            if (!navigator.onLine) {
                 showOfflineError();
+                return;
             }
 
-            window.addEventListener('online', function() {
-                window.location.reload();
+            // Дополнительная проверка на кнопке: если в момент клика пропал интернет
+            document.getElementById('start-chat-btn').addEventListener('click', function(e) {
+                if (!navigator.onLine) {
+                    e.preventDefault(); // Блокируем переход
+                    showOfflineError();
+                }
             });
+
+            // Показ экрана инициализации (1.5 секунды) для имитации загрузки
+            setTimeout(() => {
+                const screenInit = document.getElementById('screen-init');
+                const screenMain = document.getElementById('screen-main');
+                
+                // Плавно скрываем первый экран
+                screenInit.style.opacity = '0';
+                screenInit.style.visibility = 'hidden';
+                
+                // Показываем второй экран с кнопкой
+                screenMain.classList.add('visible');
+            }, 1500);
         });
     </script>
-
 </body>
 </html>
