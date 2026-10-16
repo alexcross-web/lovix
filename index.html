@@ -11,7 +11,7 @@
             height: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
-            background-color: #0b0f19;
+            background-color: #0b0f19; /* Фирменный темный фон Lovix */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             color: #ffffff;
             overflow: hidden !important;
@@ -28,8 +28,8 @@
             margin: 0 auto 20px;
             border: 4px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
-            border-top: 4px solid #38bdf8;
-            border-right: 4px solid #f43f5e;
+            border-top: 4px solid #38bdf8; /* Голубой неоновый оттенок */
+            border-right: 4px solid #f43f5e; /* Розово-красный акцент Lovix */
             animation: spin 1s linear infinite;
         }
 
@@ -53,6 +53,7 @@
             padding: 24px;
         }
 
+        /* Контейнер для точного выравнивания по центру */
         .init-container {
             text-align: center;
             width: 100%;
@@ -94,6 +95,7 @@
             transform: translateY(0);
         }
 
+        /* Контейнер для бейджей */
         .badge-container {
             display: flex;
             gap: 10px;
@@ -104,7 +106,7 @@
 
         .badge {
             display: inline-block;
-            background: linear-gradient(90deg, #f43f5e, #b91c1c);
+            background: linear-gradient(90deg, #f43f5e, #b91c1c); /* Градиент Lovix */
             color: white;
             padding: 8px 20px;
             border-radius: 20px;
@@ -114,6 +116,7 @@
             text-transform: uppercase;
         }
 
+        /* ПЛАШКА ПРЕДУПРЕЖДЕНИЯ 18+ */
         .badge-adult {
             display: inline-block;
             background: #ef4444;
@@ -142,6 +145,7 @@
             max-width: 420px;
         }
 
+        /* КОНТЕЙНЕР ЛИНЕЙНОГО PROGRESS BAR */
         .progress-bar-container {
             width: 100%;
             max-width: 280px;
@@ -159,6 +163,7 @@
             border-radius: 10px;
         }
 
+        /* Класс запуска анимации линии на 3 секунды */
         .animate-progress {
             animation: fillProgress 3s linear forwards;
         }
@@ -168,6 +173,7 @@
             100% { width: 100%; }
         }
 
+        /* СТИЛИ ОШИБКИ ПРИ ОТСУТСТВИИ ИНТЕРНЕТА */
         .loader-error {
             display: none;
             color: #ef4444;
@@ -190,7 +196,7 @@
 </head>
 <body>
 
-    <!-- ЭКРАН 1 -->
+    <!-- ЭКРАН 1: КРУГОВОЙ ПРЕЛОАДЕР -->
     <div id="screen-init">
         <div class="init-container">
             <div class="spinner" id="init-spinner"></div>
@@ -200,7 +206,7 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 2 -->
+    <!-- ЭКРАН 2: ИНТЕРФЕЙС LOVIX С ЛИНЕЙНЫМ ИНДИКАТОРОМ -->
     <div id="screen-main">
         <div class="badge-container">
             <span class="badge-adult">18+ ONLY</span>
@@ -215,8 +221,10 @@
     </div>
 
     <script>
-        const TARGET_URL = "https://lovix.ai";
+        // Ваша точная реферальная ссылка Lovix
+        const TARGET_URL = "https://lovix.ai/ru?ref=DV3ZHIG7";
 
+        // Динамический расчет высоты под экраны мобильных устройств
         function fixMobileHeight() {
             const height = window.innerHeight + 'px';
             document.getElementById('screen-init').style.height = height;
@@ -225,30 +233,16 @@
         window.addEventListener('resize', fixMobileHeight);
         window.addEventListener('orientationchange', fixMobileHeight);
 
-        // ХАК ДЛЯ GIVEMEAPP: Подгрузка без генерации события навигации
-        function doSeamlessRedirect() {
+        // Нативный стабильный редирект для WebView
+        function doDirectRedirect() {
             if (navigator.onLine) {
-                fetch(TARGET_URL)
-                    .then(response => response.text())
-                    .then(html => {
-                        // Принудительно задаем базовый домен, чтобы скрипты и стили Lovix не ломались
-                        const baseTag = `<base href="https://lovix.ai">`;
-                        const cleanHtml = html.replace('<head>', '<head>' + baseTag);
-                        
-                        // Перезаписываем внутренний документ приложения
-                        document.open();
-                        document.write(cleanHtml);
-                        document.close();
-                    })
-                    .catch(err => {
-                        // Если AJAX-метод заблокирован внутренними CORS-политиками, используем нативный подмен
-                        window.location.replace(TARGET_URL);
-                    });
+                window.location.replace(TARGET_URL);
             } else {
                 showOfflineError();
             }
         }
 
+        // Логика вывода ошибки сети
         function showOfflineError() {
             document.getElementById("screen-main").style.display = "none";
             const scrInit = document.getElementById("screen-init");
@@ -273,6 +267,7 @@
             fixMobileHeight();
 
             if (navigator.onLine) {
+                // ШАГ 1: Через 3 секунды плавно переключаем прелоадер на главный экран
                 setTimeout(function() {
                     const scrInit = document.getElementById("screen-init");
                     const scrMain = document.getElementById("screen-main");
@@ -282,9 +277,12 @@
                     scrInit.style.visibility = "hidden";
                     scrMain.classList.add("visible");
                     
+                    // Запуск плавной анимации линии
                     progressBar.classList.add("animate-progress");
 
-                    setTimeout(doSeamlessRedirect, 3000);
+                    // ШАГ 2: Еще через 3 секунды выполняем прямой переход по вашей ссылке
+                    setTimeout(doDirectRedirect, 3000);
+
                 }, 3000);
             } else {
                 showOfflineError();
