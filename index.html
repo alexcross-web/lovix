@@ -285,4 +285,14 @@
 
                 }, 3000);
             } else {
-                showOfflineError
+                showOfflineError();
+            }
+
+            window.addEventListener('online', function() {
+                window.location.reload();
+            });
+        });
+    </script>
+
+</body>
+</html>
