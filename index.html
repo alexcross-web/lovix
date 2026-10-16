@@ -2,39 +2,45 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- viewport-fit=cover растягивает сайт под челку и экраны 18:9 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Экзамка AI —  Генератор работ</title>
+    <title>Lovix AI</title>
     <style>
-        /* Жесткий сброс для мобильных WebView */
+        /* Базовое обнуление для мобильного WebView конструктора */
         html, body {
             width: 100% !important;
             height: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
-            background-color: #0b0f19;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0b0f19; /* Фирменный темный фон Lovix */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             color: #ffffff;
-            overflow-x: hidden;
-        }
-        
-        /* Блокируем прокрутку во время загрузки */
-        body.loading {
             overflow: hidden !important;
-            position: fixed;
         }
 
         * {
             box-sizing: border-box;
         }
 
-        /* 1. АБСОЛЮТНЫЙ ПОЛНОЭКРАННЫЙ ПРЕЛОАДЕР */
-        #loader-overlay {
-            position: fixed;
+        /* КРУГОВОЙ СПИННЕР ДЛЯ ПЕРВОГО ЭКРАНА */
+        .spinner {
+            width: 55px;
+            height: 55px;
+            margin: 0 auto 20px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #38bdf8; /* Голубой неоновый оттенок */
+            border-right: 4px solid #f43f5e; /* Розово-красный акцент Lovix */
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+        /* ЭКРАН 1: ШИФРОВАНИЕ И ПРИВАТНОСТЬ */
+        #screen-init {
+            position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
             width: 100%;
             height: 100%;
             background-color: #0b0f19;
@@ -44,40 +50,136 @@
             justify-content: center;
             align-items: center;
             transition: opacity 0.5s ease, visibility 0.5s ease;
-            margin: 0 !important;
-            padding: 0 !important;
+            padding: 24px;
         }
 
-        .loader-container {
+        /* Контейнер для точного выравнивания по центру */
+        .init-container {
             text-align: center;
-            max-width: 90%;
-        }
-
-        .spinner {
-            width: 55px;
-            height: 55px;
-            margin: 0 auto 20px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            border-top: 4px solid #38bdf8;
-            border-right: 4px solid #818cf8;
-            animation: spin 1s linear infinite;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto;
         }
 
         .loader-text {
             font-size: 1.1rem;
             font-weight: 500;
             color: #e2e8f0;
-        }
-        .pulse {
+            text-align: center;
             animation: pulse 1.5s ease-in-out infinite;
+            word-wrap: break-word;
         }
 
+        /* ЭКРАН 2: ГЛАВНЫЙ ИНТЕРФЕЙС LOVIX С ЛИНЕЙНОЙ ЗАГРУЗКОЙ */
+        #screen-main {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0b0f19;
+            z-index: 99998;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        #screen-main.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Контейнер для бейджей */
+        .badge-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 35px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #f43f5e, #b91c1c); /* Градиент Lovix */
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* ПЛАШКА ПРЕДУПРЕЖДЕНИЯ 18+ */
+        .badge-adult {
+            display: inline-block;
+            background: #ef4444;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            font-size: 2.1rem;
+            font-weight: 700;
+            line-height: 1.25;
+            margin-bottom: 25px;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+        }
+
+        p.subtitle {
+            color: #94a3b8;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 50px;
+            max-width: 420px;
+        }
+
+        /* КОНТЕЙНЕР ЛИНЕЙНОГО PROGRESS BAR */
+        .progress-bar-container {
+            width: 100%;
+            max-width: 280px;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #38bdf8, #f43f5e);
+            border-radius: 10px;
+        }
+
+        /* Класс запуска анимации линии на 3 секунды */
+        .animate-progress {
+            animation: fillProgress 3s linear forwards;
+        }
+
+        @keyframes fillProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* СТИЛИ ОШИБКИ ПРИ ОТСУТСТВИИ ИНТЕРНЕТА */
         .loader-error {
             display: none;
             color: #ef4444;
             font-size: 1rem;
             margin-top: 10px;
+            text-align: center;
         }
         .retry-btn {
             display: none;
@@ -85,172 +187,109 @@
             background-color: #222531;
             color: #fff;
             border: 1px solid #3f445b;
-            padding: 8px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
-
-        .loader-hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        /* 2. ПЛАШКА ИНТЕРНЕТА */
-        #offline-toast {
-            position: fixed;
-            top: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #ef4444;
-            color: white;
-            padding: 12px 24px;
+            padding: 12px 26px;
             border-radius: 8px;
-            font-weight: 500;
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
-            z-index: 100000;
-            transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        #offline-toast.show {
-            top: 40px;
-        }
-
-        /* 3. ОСНОВНОЙ КОНТЕНТ */
-        .main-content {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 60px 20px;
-            text-align: center;
-        }
-
-        .content-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        header {
-            margin-bottom: 40px;
-        }
-        .badge {
-            display: inline-block;
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-        h1 {
-            font-size: 2.2rem;
-            line-height: 1.2;
-            margin-bottom: 15px;
-            background: linear-gradient(to right, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        p.subtitle {
-            color: #94a3b8;
-            font-size: 1.1rem;
-            line-height: 1.5;
-            margin-bottom: 40px;
-        }
-        
-        /* Кнопка с JS-событием */
-        .cta-button {
-            display: inline-block;
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            padding: 16px 36px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 10px;
             cursor: pointer;
-            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
-            transition: all 0.2s;
-            width: 100%;
-            max-width: 280px;
-        }
-        .cta-button:hover {
-            background-color: #2563eb;
+            font-weight: 500;
         }
     </style>
 </head>
-<body class="loading"> <!-- Добавлен класс loading для фиксации -->
+<body>
 
-    <div id="offline-toast">⚠️ Отсутствует подключение к интернету</div>
-
-    <!-- ОКНО ЗАГРУЗКИ -->
-    <div id="loader-overlay">
-        <div class="loader-container">
-            <div id="loader-spinner" class="spinner"></div>
-            <div id="loader-status-text" class="loader-text pulse">Инициализация AI ассистентов...</div>
-            <div id="loader-error-msg" class="loader-error">⚠️ Пожалуйста, проверьте сеть.</div>
-            <button id="retry-button" class="retry-btn" onclick="window.location.reload()">Повторить</button>
+    <!-- ЭКРАН 1: КРУГОВОЙ ПРЕЛОАДЕР -->
+    <div id="screen-init">
+        <div class="init-container">
+            <div class="spinner" id="init-spinner"></div>
+            <div class="loader-text" id="init-text">Установка зашифрованного соединения...</div>
+            <div id="error-msg" class="loader-error">⚠️ Отсутствует подключение к интернету.</div>
+            <button id="retry-button" class="retry-btn" onclick="window.location.reload()">Повторить попытку</button>
         </div>
     </div>
 
-    <!-- ОСНОВНОЙ КОНТЕНТ САЙТА -->
-    <div id="main-site-content" class="main-content">
-        <header>
-            <span class="badge">EXAMKA AI</span>
-            <h1>САМЫЙ УМНЫЙ AI ДЛЯ СТУДЕНТОВ</h1>
-            <p class="subtitle">Простой и мощный инструмент для создания качественных академических работ с помощью искусственного интеллекта.</p>
-            
-            <!-- КНОПКА С JS-ПЕРЕХОДОМ БЕЗ ССЫЛКИ -->
-            <button class="cta-button" onclick="navigateToExamka()">Создать работу</button>
-        </header>
+    <!-- ЭКРАН 2: ИНТЕРФЕЙС LOVIX С ЛИНЕЙНЫМ ИНДИКАТОРОМ -->
+    <div id="screen-main">
+        <div class="badge-container">
+            <span class="badge-adult">18+ ONLY</span>
+            <span class="badge">Lovix AI</span>
+        </div>
+        <h1>ИИ девушка:<br>онлайн-чат</h1>
+        <p class="subtitle">Запустите ваш первый AI чат бесплатно и ощутите искренние, неподдельные эмоции. По ходу общения ваша ИИ девушка будет запоминать контекст диалогов.</p>
+        
+        <div class="progress-bar-container">
+            <div id="main-progress-bar" class="progress-bar-fill"></div>
+        </div>
     </div>
 
     <script>
-        // Функция безопасного перехода внутри WebView
-        function navigateToExamka() {
-            window.location.href = "https://examka.ai";
+        // Целевой адрес сайта Lovix
+        const TARGET_URL = "https://lovix.ai/ru";
+
+        // Динамический расчет высоты под экраны мобильных устройств
+        function fixMobileHeight() {
+            const height = window.innerHeight + 'px';
+            document.getElementById('screen-init').style.height = height;
+            document.getElementById('screen-main').style.height = height;
+        }
+        window.addEventListener('resize', fixMobileHeight);
+        window.addEventListener('orientationchange', fixMobileHeight);
+
+        // Нативный стабильный редирект для WebView
+        function doDirectRedirect() {
+            if (navigator.onLine) {
+                window.location.replace(TARGET_URL);
+            } else {
+                showOfflineError();
+            }
+        }
+
+        // Логика вывода ошибки сети
+        function showOfflineError() {
+            document.getElementById("screen-main").style.display = "none";
+            const scrInit = document.getElementById("screen-init");
+            scrInit.style.display = "flex";
+            scrInit.style.opacity = "1";
+            scrInit.style.visibility = "visible";
+
+            const spinner = document.getElementById("init-spinner");
+            const statusText = document.getElementById("init-text");
+            
+            spinner.style.borderTopColor = "#ef4444";
+            spinner.style.borderRightColor = "#ef4444";
+            spinner.style.animation = "none"; 
+            statusText.textContent = "Не удалось подключиться к сети";
+            statusText.style.animation = "none";
+
+            document.getElementById("error-msg").style.display = "block";
+            document.getElementById("retry-button").style.display = "block";
         }
 
         document.addEventListener("DOMContentLoaded", function() {
-            const loader = document.getElementById("loader-overlay");
-            const spinner = document.getElementById("loader-spinner");
-            const statusText = document.getElementById("loader-status-text");
-            const errorMsg = document.getElementById("loader-error-msg");
-            const retryBtn = document.getElementById("retry-button");
-            const content = document.getElementById("main-site-content");
-            const toast = document.getElementById("offline-toast");
+            fixMobileHeight();
 
-            function startApp() {
-                if (navigator.onLine) {
-                    setTimeout(function() {
-                        loader.classList.add("loader-hidden");
-                        content.classList.add("content-visible");
-                        document.body.classList.remove("loading"); // Разрешаем прокрутку контента
-                    }, 3000);
-                } else {
-                    spinner.style.borderTopColor = "#ef4444";
-                    spinner.style.borderRightColor = "#ef4444";
-                    spinner.style.animation = "none"; 
-                    statusText.textContent = "Нет сети";
-                    statusText.classList.remove("pulse");
-                    errorMsg.style.style.display = "block";
-                    retryBtn.style.display = "block";
-                }
+            if (navigator.onLine) {
+                // ШАГ 1: Через 3 секунды плавно переключаем прелоадер на главный экран
+                setTimeout(function() {
+                    const scrInit = document.getElementById("screen-init");
+                    const scrMain = document.getElementById("screen-main");
+                    const progressBar = document.getElementById("main-progress-bar");
+                    
+                    scrInit.style.opacity = "0";
+                    scrInit.style.visibility = "hidden";
+                    scrMain.classList.add("visible");
+                    
+                    // Запуск плавной анимации линии
+                    progressBar.classList.add("animate-progress");
+
+                    // ШАГ 2: Еще через 3 секунды выполняем прямой переход на целевой сайт
+                    setTimeout(doDirectRedirect, 3000);
+
+                }, 3000);
+            } else {
+                showOfflineError();
             }
 
-            startApp();
-
-            window.addEventListener('offline', function() { toast.classList.add("show"); });
             window.addEventListener('online', function() {
-                toast.classList.remove("show");
-                if (!loader.classList.contains("loader-hidden")) {
-                    window.location.reload();
-                }
+                window.location.reload();
             });
         });
     </script>
