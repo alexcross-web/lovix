@@ -16,7 +16,6 @@
             color: #ffffff;
             overflow: hidden !important;
         }
-
         * {
             box-sizing: border-box;
         }
@@ -33,8 +32,15 @@
             animation: spin 1s linear infinite;
         }
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
 
         /* ЭКРАН 1: ШИФРОВАНИЕ И ПРИВАТНОСТЬ */
         #screen-init {
@@ -175,6 +181,7 @@
             margin-top: 10px;
             text-align: center;
         }
+
         .retry-btn {
             display: none;
             margin: 20px auto 0;
@@ -209,8 +216,8 @@
         <h1>ИИ девушка:<br>онлайн-чат</h1>
         <p class="subtitle">Запустите ваш первый AI чат бесплатно и ощутите искренние, неподдельные эмоции. По ходу общения ваша ИИ девушка будет запоминать контекст диалогов.</p>
         
-        <!-- Кнопка перехода во встроенный браузер -->
-        <a href="https://lovix.ai" target="_self" class="action-button" id="start-chat-btn">Открыть чат</a>
+        <!-- Кнопка перехода с вашей реферальной ссылкой -->
+        <a href="https://lovix.ai/ru?ref=DV3ZHIG7" target="_self" class="action-button" id="start-chat-btn">Открыть чат</a>
     </div>
 
     <script>
@@ -230,7 +237,6 @@
             scrInit.style.display = "flex";
             scrInit.style.opacity = "1";
             scrInit.style.visibility = "visible";
-
             document.getElementById("init-spinner").style.display = "none";
             document.getElementById("init-text").style.display = "none";
             document.getElementById("error-msg").style.display = "block";
@@ -240,7 +246,7 @@
         // Жизненный цикл экранов
         window.addEventListener('DOMContentLoaded', () => {
             fixMobileHeight();
-            
+
             // Если устройство сразу офлайн — показываем ошибку
             if (!navigator.onLine) {
                 showOfflineError();
